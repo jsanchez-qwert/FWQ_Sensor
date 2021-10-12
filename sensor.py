@@ -1,49 +1,32 @@
-"""
-    TODO majear las señales de sistema para la interrupcion del bucle infinito
-"""
 import random
 import re
+import signal
 import time
 from sys import argv
 
 from kafka import KafkaProducer
 
+COLA_INICIAL = 20
 
-class Sensor:
-    def __init__(self, ip_servidor: str, puerto: int, id: str):
-        """
-        Inicializa el sensor de la atraccion que le digas
-        :param ip_servidor: ip del setvidor de kafka
-        :param puerto: puerto del servidor de kafka
-        :param id: identificador de la atraccion
-        """
-        self.p_cola = 20
-        self.ip = ip_servidor
-        self.puerto = puerto
-        self.id = id
-        self.producer = KafkaProducer(bootstrap_servers=f'{self.ip}:{self.puerto}')
 
-    def close(self):
-        self.producer.close()
-
-    def run(self):
-        """
-        Envia cada 1-3 segundo cuantas personas hay en la atraccion
-        :return:
-        """
-        while True:
-            time.sleep(random.randint(1, 3))
-            mensaje = str(self.id).encode() + b' ' + str(self.p_cola).encode()
-            print(mensaje)
-            self.producer.send("atracciones", mensaje)
-            self.p_cola += abs(random.randint(-4, 4))
+def run(productor: KafkaProducer) -> None:
+    """
+    Envia cada 1-3 segundo cuantas personas hay en la atraccion
+    """
+    interrupted = False
+    p_cola = COLA_INICIAL
+    while running:
+        mensaje = str(atraccion).encode() + b' ' + str(p_cola).encode()
+        print(mensaje)
+        productor.send("atracciones", mensaje)
+        p_cola += abs(random.randint(-4, 4))
+        time.sleep(random.randint(1, 3))
 
 
 def filtra(args: list) -> bool:
     """
     Indica si el formato de los argumentos es el correcto
-    :param args:
-    :return:
+    :param args: Argumentos del programa
     """
     if len(argv) != 3:
         print("Numero incorrecto de argumentos")
@@ -57,6 +40,15 @@ def filtra(args: list) -> bool:
     return True
 
 
+def signal_handler(sig, frame):
+    """
+    Maneja la flag de final para terminal el bucle infinito cuando se le manda SIGINT
+    """
+    global running
+    print("TERMINANDO PROCESO DE SENSOR")
+    running = False
+
+
 if __name__ == '__main__':
     if not filtra(argv):
         print("ERROR: Argumentos incorrectos")
@@ -67,10 +59,15 @@ if __name__ == '__main__':
     ip = argv[1].split(':')[0]
     port = int(argv[1].split(':')[1])
     atraccion = argv[2]
+
+    signal.signal(signal.SIGINT, signal_handler)
+    running = True
     try:
-        s = Sensor(ip, port, atraccion)
-        s.run()
+        producer = KafkaProducer(bootstrap_servers=f'{ip}:{port}')
+        run(producer)
     except Exception as e:
         print("ERROR: ", e)
     finally:
-        s.close()
+        if 'producer' in locals():
+            producer.close()
+    exit(0)

@@ -19,7 +19,11 @@ def run(productor: KafkaProducer) -> None:
         mensaje = str(atraccion).encode() + b' ' + str(p_cola).encode()
         print(mensaje)
         productor.send("atracciones", mensaje)
-        p_cola += abs(random.randint(-4, 4))
+        p_cola += random.randint(-4, 4)
+        if p_cola > 50 :
+            p_cola = 49
+        if p_cola < 0 :
+            p_cola = 0
         time.sleep(random.randint(1, 3))
 
 

@@ -15,7 +15,7 @@ python3 ./sensor.py $1:$2 Fotos_Josefa &
 id_4=$!
 echo "$id_4"
 
-sleep 10000
+sleep 1728000
 kill -2 "$id_1"
 kill -2 "$id_2"
 kill -2 "$id_3"

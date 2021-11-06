@@ -1,17 +1,17 @@
-python3 ./sensor.py $1:$2 tiana &
+python3 ./sensor.py $1:$2 D &
 # shellcheck disable=SC2116
 id_1=$!
 echo "$id_1"
 
-python3 ./sensor.py $1:$2 Tobogan &
+python3 ./sensor.py $1:$2 A &
 id_2=$!
 echo "$id_2"
 
-python3 ./sensor.py $1:$2 Aguaparque &
+python3 ./sensor.py $1:$2 B &
 id_3=$!
 echo "$id_3"
 
-python3 ./sensor.py $1:$2 Fotos_Josefa &
+python3 ./sensor.py $1:$2 C &
 id_4=$!
 echo "$id_4"
 

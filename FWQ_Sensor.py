@@ -19,9 +19,9 @@ def run(productor: KafkaProducer) -> None:
         mensaje = str(atraccion).encode() + b' ' + str(p_cola).encode()
         print(mensaje)
         productor.send("atracciones", mensaje)
-        p_cola += random.randint(-4, 4)
-        if p_cola > 50 :
-            p_cola = 49
+        p_cola += random.randint(-4, 6)
+        if p_cola > 80 :
+            p_cola = 62
         if p_cola < 0 :
             p_cola = 0
         time.sleep(random.randint(1, 3))
@@ -56,8 +56,8 @@ def signal_handler(sig, frame):
 if __name__ == '__main__':
     if not filtra(argv):
         print("ERROR: Argumentos incorrectos")
-        print("Usage: sensor.py <ip_servidor:puerto> <id> ")
-        print("Example: sensor.py 192.168.56.33:9092 02")
+        print("Usage: FWQ_Sensor.py <ip_servidor:puerto> <id> ")
+        print("Example: FWQ_Sensor.py 192.168.56.33:9092 02")
         exit()
 
     ip = argv[1].split(':')[0]
